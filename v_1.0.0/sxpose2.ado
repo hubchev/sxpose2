@@ -1,6 +1,4 @@
-*! Stephan Huber (stephan.huber@hs-fresenius.de) version 1.1.0 -- 26 February 2025: integer values not dropped, warning message
-*  version 1.0.0 -- 17 October 2020 
-
+*! Stephan Huber (DrStephanHuber@yahoo.com) 1.0.0 17 October 2020
 program sxpose2 
 	version 8 
 	syntax , clear [ force Format(string) FIRSTnames DEstring VARLabel VARName] 
@@ -52,9 +50,7 @@ program sxpose2
 
 	unab varlist: * 
 	tokenize `varlist' 
-	
 
-	
 	qui forval j = 1/`nobs' { 
 		gen _var`j' = "" 
 		forval i = 1/`nvars' { 
@@ -108,28 +104,15 @@ program sxpose2
 		
 	drop `varlist' 
 	if `nobs' > `nvars' qui keep in 1/`nvars' 
-	
 
-	if "`firstnames'" != "" { 
-		local count_drop = 0
+	qui if "`firstnames'" != "" { 
 		forval j = 1/`nobs' { 
-		cap rename _var`j' `= _var`j'[1]' 
-		if _rc { 
-			cap rename _var`j' `= "_" + _var`j'[1]'
-			local count_drop = `count_drop' + 1
-			}
-		}
-		if `count_drop' > 0 {
-			display as text "################################## Note: ###################################"
-			dis as text "#   Some values of the first variable are not legal variable names."
-			dis as text "#   A leading underscore (_) will be added to integer values."
-			dis as err "#   Other non legal values are replaced by a numbered placeholder (_var?)." 
-			display as text "############################################################################"
+		capture rename _var`j' `= _var`j'[1]' 
 		}
 		drop in 1 
 	} 	
 		
-	qui if "`destring'" != "" destring, replace 
+	if "`destring'" != "" destring, replace 
 	
 	drop ___000vlist*
 		
